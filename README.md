@@ -77,8 +77,8 @@ CI also checks workflow syntax and reusable-workflow source selection. See
 Extraction is tracked in the
 [source project's umbrella issue](https://github.com/BohdanMoroz11/personal-website/issues/64) and
 [extraction issue](https://github.com/BohdanMoroz11/personal-website/issues/68). There is no release
-tag or stable workflow interface yet. Website migration and a real Claude review/retry remain
-integration gates.
+tag or stable workflow interface yet. Hosted review, gate, and controlled fix/push coverage and
+remaining limits are recorded below.
 
 See the [verification record](docs/verification.md), [release policy](docs/releases.md), and
 [changelog](CHANGELOG.md) for evidence and release status.

@@ -33,7 +33,8 @@ The agent read the CI log, changed only subtraction to addition, committed as th
 bot, pushed
 [commit 8e7fb50](https://github.com/BohdanMoroz11/personal-website/commit/8e7fb50c6873eb65fc865edde84d9c703e730b17),
 and reported the matching final SHA. The App push triggered
-[new consumer CI](https://github.com/BohdanMoroz11/personal-website/actions/runs/42387156438).
+[new consumer CI](https://github.com/BohdanMoroz11/personal-website/actions/runs/42387156438), and
+static checks, Playwright/axe, and Lighthouse all passed.
 
 This verifies actual model/git authentication and CI triggering. It is a composed integration
 diagnostic, not an assertion that a naturally occurring adoptable major passed through the entire
