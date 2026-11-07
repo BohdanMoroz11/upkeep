@@ -1,0 +1,25 @@
+{
+  "name": "upkeep",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Reusable dependency update automation for GitHub, Renovate, npm, and Claude Code.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BohdanMoroz11/upkeep.git"
+  },
+  "engines": {
+    "node": ">=26 <27"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate:preset": "renovate-config-validator --strict --no-global default.json",
+    "check": "npm run format:check && npm run validate:preset"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10",
+    "renovate": "44.222.1"
+  }
+}
