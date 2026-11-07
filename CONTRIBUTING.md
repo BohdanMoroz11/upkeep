@@ -32,6 +32,5 @@ Describe the problem, resulting behavior, and relevant validation in PRs. Change
 markers, stored state, labels, workflow inputs, or secrets affect the consumer interface and need
 explicit documentation.
 
-The first release follows extraction and verification in the website. Use immutable release tags for
-shared behavior; do not publish a stable tag while caller workflows or recovery paths remain
-unverified.
+Use immutable release tags for shared behavior and follow docs/releases.md. Record integration
+evidence and limits before publishing changes to caller contracts or recovery paths.

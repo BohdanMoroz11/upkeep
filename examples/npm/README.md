@@ -4,9 +4,9 @@ This example contains the Renovate preset reference and three executable trigger
 targets GitHub.com and an npm project whose manifests live at the repository root. Follow
 [setup](../../docs/setup.md) for labels, required CI, auto-merge, App configuration, and secrets.
 
-The examples reference mutable `main` for development. Before adoption, select a reviewed commit and
-eventually a tagged release for both preset and workflows. The runtime automatically uses the
-reusable workflow's selected source commit.
+The examples pin the preset and workflows to **v0.1.0**. Update those references together when
+adopting another reviewed release. The runtime automatically uses the reusable workflow's selected
+source commit.
 
 - `upkeep-review.yml`: labeled/opened major PRs and explicit re-review dispatch.
 - `upkeep-retry.yml`: completed CI runs and dispatch from a finished review/fixer.

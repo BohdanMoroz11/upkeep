@@ -1,6 +1,7 @@
 # Security
 
-Upkeep is unreleased. No version is currently supported for production adoption.
+The current release series is `0.1.x`. Security fixes target the latest published release in this
+series. Read the trust boundary below and the verification record before adoption.
 
 ## Reporting
 

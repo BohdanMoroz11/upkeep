@@ -1,4 +1,4 @@
-# Development example: replace @main with a reviewed release tag or commit before adoption.
+# Pin all Upkeep workflow and preset references to the same release.
 name: Upkeep watchdog
 
 on:
@@ -25,7 +25,7 @@ permissions:
 
 jobs:
   watchdog:
-    uses: BohdanMoroz11/upkeep/.github/workflows/watchdog.yml@main
+    uses: BohdanMoroz11/upkeep/.github/workflows/watchdog.yml@v0.1.0
     with:
       app-client-id: ${{ vars.DEP_AGENT_APP_CLIENT_ID }}
       app-slug: ${{ vars.DEP_AGENT_APP_SLUG }}
