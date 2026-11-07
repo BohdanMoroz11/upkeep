@@ -12,18 +12,19 @@ npm ci --ignore-scripts
 npm run check
 ```
 
-Run `npm run format` to format changes. The preset validator is version-pinned in `package.json` and
-installed through the lockfile.
+Run `npm run format` to format changes. The preset validator and build/test tools are pinned and
+installed through the lockfile. Run `npm run build` after runtime or prompt changes; the bundle is a
+committed artifact.
 
 ## Implementation boundaries
 
 Put state decisions in `src/`, agent instructions in `prompts/`, and controller packaging in
-`actions/controller/`. Reusable workflows will live in `.github/workflows/`; consumer event wrappers
-will live in `examples/npm/.github/workflows/` once executable.
+`actions/controller/`. Reusable workflows live in `.github/workflows/`; executable consumer event
+wrappers live in `examples/npm/.github/workflows/`.
 
-Add regression tests alongside the extracted controller. Sanitize fixtures and keep private keys,
-tokens, private logs, and personal project content out of them. CI currently checks the files that
-exist; controller tests and workflow checks will be added with those implementations.
+Add regression tests with controller changes. Sanitize fixtures and exclude secrets, private logs,
+and personal project content. CI checks regressions, bundle freshness, preset validity, workflow
+syntax, and hosted reusable-workflow source selection.
 
 ## Changes and releases
 

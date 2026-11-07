@@ -1,7 +1,8 @@
 # Controller source
 
-Controller extraction belongs here. Start with the website's tested trust, verdict, retry, and
-blocked-state decisions; then separate GitHub API orchestration. See
-[architecture](../docs/architecture.md).
+State logic and injected orchestration live here; `entry.mjs` connects them to GitHub Actions. See
+[architecture](../docs/architecture.md) for module boundaries and
+[controller action](../actions/controller/README.md) for operations.
 
-No executable controller is shipped in the repository base.
+Never import project dependencies into this runtime or read controller code from a dependency PR.
+Keep mutations in the API adapter and pass collaborators to orchestration tests.

@@ -1,12 +1,13 @@
 # Behavior
 
-This is the behavior to preserve from the website implementation. Only the preset is currently
-implemented in Upkeep.
+This behavior is extracted from the website implementation. Website adoption remains an integration
+gate.
 
 ## Routine updates
 
 Renovate groups patch, minor, pin, and digest updates into one PR eligible for platform automerge.
-Required consumer CI is the merge gate. Major updates stay separate and receive `dep:major-review`.
+Required consumer CI is the merge gate. Major updates explicitly clear inherited grouping so each
+target can be reviewed and tracked independently, and receive `dep:major-review`.
 
 ## Major review
 
@@ -39,3 +40,7 @@ recorded blockers become compatible. Routine rebases and unrelated dependency ch
 The watchdog reports stranded or conflicting PRs. Missing verdicts, crashes, and missing credentials
 must be visible. The extraction must preserve and test these failure paths before consumer
 migration.
+
+Only incompatible latest published direct peer ranges are tracked as automated BLOCKED state. Other
+adoption constraints require NEEDS-HUMAN so the scanner does not repeatedly wake an unrepresentable
+blocker.

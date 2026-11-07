@@ -1,0 +1,36 @@
+# Development example: replace @main with a reviewed release tag or commit before adoption.
+name: Upkeep watchdog
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      credentials_only:
+        description: Verify App access without scanning PRs
+        type: boolean
+        default: false
+
+concurrency:
+  group: upkeep-watchdog
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  actions: read
+
+jobs:
+  watchdog:
+    uses: BohdanMoroz11/upkeep/.github/workflows/watchdog.yml@main
+    with:
+      app-client-id: ${{ vars.DEP_AGENT_APP_CLIENT_ID }}
+      app-slug: ${{ vars.DEP_AGENT_APP_SLUG }}
+      ci-workflow: ci.yml
+      sanity-command: npm run typecheck
+      credentials-only: ${{ inputs.credentials_only || false }}
+    secrets:
+      app-private-key: ${{ secrets.DEP_AGENT_APP_PRIVATE_KEY }}

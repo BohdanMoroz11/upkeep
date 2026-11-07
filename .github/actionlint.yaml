@@ -1,0 +1,6 @@
+# GitHub.com documents these new fields; actionlint 1.7.12's job schema predates them.
+# https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#job-context
+paths:
+  "**/*.yml":
+    ignore:
+      - 'property "workflow_(repository|sha)" is not defined in object type'
