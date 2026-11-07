@@ -8,8 +8,8 @@ Renovate, GitHub Actions, and Claude Code to keep routine updates automatic and 
 reviewable.
 
 **Status: unreleased.** The preset, controller action, prompts, reusable workflows, and consumer
-examples are implemented. The website continues using its local implementation until shared-workflow
-adoption is validated.
+examples are implemented. The website now calls a pinned shared implementation. Post-adoption fixes
+and release verification are in progress.
 
 ## The flow
 
@@ -79,6 +79,9 @@ Extraction is tracked in the
 [extraction issue](https://github.com/BohdanMoroz11/personal-website/issues/68). There is no release
 tag or stable workflow interface yet. Website migration and a real Claude review/retry remain
 integration gates.
+
+See the [verification record](docs/verification.md), [release policy](docs/releases.md), and
+[changelog](CHANGELOG.md) for evidence and release status.
 
 ## License
 
