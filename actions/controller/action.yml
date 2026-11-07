@@ -1,0 +1,43 @@
+name: Upkeep controller
+description: Dependency review state, trust checks, and GitHub orchestration
+inputs:
+  operation:
+    description:
+      preflight, retry-gate, verify-head, prepare-agent, verify-review, verify-retry, watchdog, or
+      report-failure
+    required: true
+  config:
+    description: JSON configuration using reusable workflow input names
+    required: true
+  pr:
+    description: PR number for explicit operations
+  sha:
+    description: Expected inspected SHA
+  branch:
+    description: Expected Renovate branch
+outputs:
+  pr_number:
+    description: Trusted PR number
+  head_sha:
+    description: Inspected or verified final SHA
+  head_branch:
+    description: Trusted PR branch
+  started_at:
+    description: Start of the current review
+  skip:
+    description: Whether the retry is ineligible
+  attempt:
+    description: Retry attempt number
+  ci_run_id:
+    description: Failed consumer CI run
+  verdict:
+    description: Verified review verdict
+  prompt:
+    description: Rendered agent instructions
+  bot_id:
+    description: App bot numeric user ID
+  bot_name:
+    description: App bot login
+runs:
+  using: node24
+  main: dist/index.cjs

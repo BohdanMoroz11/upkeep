@@ -16,10 +16,19 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "validate:preset": "renovate-config-validator --strict --no-global default.json",
-    "check": "npm run format:check && npm run validate:preset"
+    "check": "npm run format:check && npm test && npm run build:check && npm run validate:preset",
+    "build": "node scripts/build.mjs",
+    "build:check": "node scripts/build.mjs --check",
+    "test": "vitest run"
   },
   "devDependencies": {
     "prettier": "3.9.10",
-    "renovate": "44.222.1"
+    "renovate": "44.222.1",
+    "esbuild": "0.28.2",
+    "vitest": "5.1.0",
+    "yaml": "2.9.1"
+  },
+  "dependencies": {
+    "semver": "7.8.6"
   }
 }

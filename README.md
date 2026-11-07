@@ -7,9 +7,9 @@ Upkeep is being extracted from the automation used by
 Renovate, GitHub Actions, and Claude Code to keep routine updates automatic and make major updates
 reviewable.
 
-**Status: initial foundation, unreleased.** The Renovate preset is present. Reusable agent workflows
-and the controller are not implemented here yet. The website continues using its local
-implementation until the shared version is validated.
+**Status: unreleased.** The preset, controller action, prompts, reusable workflows, and consumer
+examples are implemented. The website continues using its local implementation until shared-workflow
+adoption is validated.
 
 ## The flow
 
@@ -37,20 +37,20 @@ These behaviors already exist in the source website; the extraction will preserv
 
 ## Repository guide
 
-| Path                       | Purpose                                            |
-| -------------------------- | -------------------------------------------------- |
-| `default.json`             | Shareable Renovate preset                          |
-| `.github/workflows/ci.yml` | Validation for Upkeep itself                       |
-| `src/`                     | Controller implementation boundary                 |
-| `actions/controller/`      | Controller action packaging boundary               |
-| `prompts/`                 | Review and retry prompt boundary                   |
-| `tests/fixtures/`          | Sanitized regression event cases                   |
-| `examples/npm/`            | Consumer configuration and future trigger wrappers |
-| `docs/`                    | Setup, behavior, and architecture                  |
+| Path                       | Purpose                                       |
+| -------------------------- | --------------------------------------------- |
+| `default.json`             | Shareable Renovate preset                     |
+| `.github/workflows/ci.yml` | Validation for Upkeep itself                  |
+| `src/`                     | Controller decisions and API orchestration    |
+| `actions/controller/`      | Bundled standalone controller action          |
+| `prompts/`                 | Generic review and retry instructions         |
+| `tests/fixtures/`          | Sanitized regression event cases              |
+| `examples/npm/`            | Consumer preset and executable event wrappers |
+| `docs/`                    | Setup, behavior, and architecture             |
 
 Start with [setup](docs/setup.md), [behavior](docs/behavior.md), and
-[architecture](docs/architecture.md). The [npm example](examples/npm/README.md) describes what is
-available today and what still needs extraction.
+[architecture](docs/architecture.md). The [npm example](examples/npm/README.md) contains the
+development caller configuration.
 
 ## Scope
 
@@ -70,14 +70,15 @@ npm ci --ignore-scripts
 npm run check
 ```
 
-`check` validates formatting and the preset with Renovate's configuration validator. It does not
-claim to test the unimplemented controller or agent workflows. See
+`check` runs regression tests, standalone-bundle checks, formatting, and Renovate preset validation.
+CI also checks workflow syntax and reusable-workflow source selection. See
 [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Extraction is tracked in the
 [source project's umbrella issue](https://github.com/BohdanMoroz11/personal-website/issues/64) and
 [extraction issue](https://github.com/BohdanMoroz11/personal-website/issues/68). There is no release
-tag or stable workflow interface yet.
+tag or stable workflow interface yet. Website migration and a real Claude review/retry remain
+integration gates.
 
 ## License
 

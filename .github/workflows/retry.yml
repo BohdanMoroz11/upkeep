@@ -1,0 +1,213 @@
+name: Upkeep retry
+
+on:
+  workflow_call:
+    inputs:
+      app-client-id:
+        description: Consumer-owned GitHub App Client ID
+        type: string
+        required: true
+      app-slug:
+        description: App slug without the bot suffix
+        type: string
+        required: true
+      base-branch:
+        type: string
+        default: main
+      ci-workflow:
+        description: Consumer CI workflow filename
+        type: string
+        default: ci.yml
+      review-workflow:
+        description: Consumer review wrapper filename for dispatch
+        type: string
+        default: upkeep-review.yml
+      retry-workflow:
+        description: Consumer retry wrapper filename for dispatch
+        type: string
+        default: upkeep-retry.yml
+      notification-target:
+        description: Optional GitHub login or org/team to mention
+        type: string
+        default: ""
+      legacy-comment-author:
+        description: Optional trusted author of verdicts from before Upkeep adoption
+        type: string
+        default: ""
+      sanity-command:
+        description: One npm run script used after agent edits
+        type: string
+        default: npm run typecheck
+      node-version:
+        type: string
+        default: "26"
+      model:
+        type: string
+        default: sonnet
+    secrets:
+      app-private-key:
+        required: true
+      claude-code-oauth-token:
+        required: true
+
+jobs:
+  retry:
+    if: >-
+      github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'failure')
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+      id-token: write
+    env:
+      UPKEEP_CONFIG: ${{ toJSON(inputs) }}
+    outputs:
+      pr_number: ${{ steps.gate.outputs.pr_number }}
+    steps:
+      # job.workflow_* identifies this reusable workflow, not the caller.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: _upkeep
+          persist-credentials: false
+      - name: Stage the bundled runtime outside the consumer checkout
+        shell: bash
+        run: |
+          cp _upkeep/actions/controller/dist/index.cjs "$RUNNER_TEMP/upkeep-controller.cjs"
+          echo "UPKEEP_INSTALL_LOG=$RUNNER_TEMP/upkeep-install.log" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Validate live Renovate PR and event
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" retry-gate
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.gate.outputs.skip == 'false'
+        with:
+          ref: ${{ steps.gate.outputs.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify checkout before installation
+        id: head
+        if: steps.gate.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPKEEP_PR: ${{ steps.gate.outputs.pr_number }}
+          UPKEEP_SHA: ${{ steps.gate.outputs.head_sha }}
+          UPKEEP_BRANCH: ${{ steps.gate.outputs.head_branch }}
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" verify-head
+      - name: Install dependencies as non-fatal evidence
+        if: steps.head.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee "$UPKEEP_INSTALL_LOG"
+      - name: Recheck inspected head before issuing write token
+        if: steps.head.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPKEEP_PR: ${{ steps.gate.outputs.pr_number }}
+          UPKEEP_SHA: ${{ steps.gate.outputs.head_sha }}
+          UPKEEP_BRANCH: ${{ steps.gate.outputs.head_branch }}
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" verify-head
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        id: agent_token
+        if: steps.head.outcome == 'success'
+        with:
+          client-id: ${{ inputs.app-client-id }}
+          private-key: ${{ secrets.app-private-key }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
+          permission-actions: read
+      - name: Verify configured App identity
+        if: steps.agent_token.outcome == 'success'
+        env:
+          EXPECTED_SLUG: ${{ inputs.app-slug }}
+          ACTUAL_SLUG: ${{ steps.agent_token.outputs.app-slug }}
+        run: test "$ACTUAL_SLUG" = "$EXPECTED_SLUG"
+      - name: Prepare generic agent prompt
+        id: prompt
+        if: steps.agent_token.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ steps.agent_token.outputs.token }}
+          UPKEEP_PR: ${{ steps.gate.outputs.pr_number }}
+          UPKEEP_SHA: ${{ steps.gate.outputs.head_sha }}
+          UPKEEP_BRANCH: ${{ steps.gate.outputs.head_branch }}
+          UPKEEP_KIND: retry
+          UPKEEP_CI_RUN_ID: ${{ steps.gate.outputs.ci_run_id }}
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" prepare-agent
+      - uses: anthropics/claude-code-action@074f3963a45f3e002e58c97dd0ddf472e0146bf5 # v1
+        if: steps.prompt.outcome == 'success'
+        with:
+          allowed_bots: renovate[bot]
+          claude_code_oauth_token: ${{ secrets.claude-code-oauth-token }}
+          github_token: ${{ steps.agent_token.outputs.token }}
+          bot_id: ${{ steps.prompt.outputs.bot_id }}
+          bot_name: ${{ steps.prompt.outputs.bot_name }}
+          prompt: ${{ steps.prompt.outputs.prompt }}
+          claude_args: >-
+            --model ${{ inputs.model }} --max-turns 50 --permission-mode acceptEdits --allowedTools
+            "Edit,MultiEdit,Write,Read,Glob,Grep,LS,WebSearch,WebFetch,Bash(git:*),Bash(grep:*),Bash(head:*),Bash(tail:*),Bash(${{
+            inputs.sanity-command }}),Bash(npm view:*),Bash(npm ls:*),Bash(gh pr comment:*),Bash(gh
+            pr view:*),Bash(gh pr diff:*),Bash(gh run view:*),Bash(gh api:*)"
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        id: report_token
+        if: always() && steps.agent_token.outcome == 'success'
+        with:
+          client-id: ${{ inputs.app-client-id }}
+          private-key: ${{ secrets.app-private-key }}
+          permission-contents: read
+          permission-pull-requests: write
+          permission-issues: write
+          permission-actions: write
+      - name: Verify final head report and reconcile state
+        if: always() && steps.report_token.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ steps.report_token.outputs.token }}
+          UPKEEP_PR: ${{ steps.gate.outputs.pr_number }}
+          UPKEEP_SHA: ${{ steps.gate.outputs.head_sha }}
+          UPKEEP_STARTED_AT: ${{ steps.gate.outputs.started_at }}
+          UPKEEP_CI_RUN_ID: ${{ steps.gate.outputs.ci_run_id }}
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" verify-retry
+
+  report-failure:
+    needs: retry
+    if: always() && needs.retry.result == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    env:
+      UPKEEP_CONFIG: ${{ toJSON(inputs) }}
+    steps:
+      # job.workflow_* identifies this reusable workflow, not the caller.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: _upkeep
+          persist-credentials: false
+      - name: Stage the bundled runtime outside the consumer checkout
+        shell: bash
+        run: |
+          cp _upkeep/actions/controller/dist/index.cjs "$RUNNER_TEMP/upkeep-controller.cjs"
+          echo "UPKEEP_INSTALL_LOG=$RUNNER_TEMP/upkeep-install.log" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Report failed workflow on trusted PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPKEEP_PR:
+            ${{ needs.retry.outputs.pr_number || github.event.pull_request.number ||
+            github.event.inputs.pr_number }}
+          UPKEEP_KIND: retry
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" report-failure

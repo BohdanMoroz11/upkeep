@@ -1,0 +1,107 @@
+name: Upkeep watchdog
+
+on:
+  workflow_call:
+    inputs:
+      app-client-id:
+        description: Consumer-owned GitHub App Client ID
+        type: string
+        required: true
+      app-slug:
+        description: App slug without the bot suffix
+        type: string
+        required: true
+      base-branch:
+        type: string
+        default: main
+      ci-workflow:
+        description: Consumer CI workflow filename
+        type: string
+        default: ci.yml
+      review-workflow:
+        description: Consumer review wrapper filename for dispatch
+        type: string
+        default: upkeep-review.yml
+      retry-workflow:
+        description: Consumer retry wrapper filename for dispatch
+        type: string
+        default: upkeep-retry.yml
+      notification-target:
+        description: Optional GitHub login or org/team to mention
+        type: string
+        default: ""
+      legacy-comment-author:
+        description: Optional trusted author of verdicts from before Upkeep adoption
+        type: string
+        default: ""
+      sanity-command:
+        description: One npm run script used after agent edits
+        type: string
+        default: npm run typecheck
+      node-version:
+        type: string
+        default: "26"
+      model:
+        type: string
+        default: sonnet
+      credentials-only:
+        description: Check App authentication without scanning or mutating PRs
+        type: boolean
+        default: false
+    secrets:
+      app-private-key:
+        required: true
+
+jobs:
+  watchdog:
+    if: >-
+      github.event_name == 'push' || github.event_name == 'schedule' || github.event_name ==
+      'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+    env:
+      UPKEEP_CONFIG: ${{ toJSON(inputs) }}
+    steps:
+      # job.workflow_* identifies this reusable workflow, not the caller.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: _upkeep
+          persist-credentials: false
+      - name: Stage the bundled runtime outside the consumer checkout
+        shell: bash
+        run: |
+          cp _upkeep/actions/controller/dist/index.cjs "$RUNNER_TEMP/upkeep-controller.cjs"
+          echo "UPKEEP_INSTALL_LOG=$RUNNER_TEMP/upkeep-install.log" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ inputs.node-version }}
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        id: scan_token
+        with:
+          client-id: ${{ inputs.app-client-id }}
+          private-key: ${{ secrets.app-private-key }}
+          permission-contents: ${{ inputs.credentials-only && 'write' || 'read' }}
+          permission-pull-requests: write
+          permission-issues: write
+          permission-actions: write
+      - name: Verify App identity and repository access
+        env:
+          GH_TOKEN: ${{ steps.scan_token.outputs.token }}
+          EXPECTED_SLUG: ${{ inputs.app-slug }}
+          ACTUAL_SLUG: ${{ steps.scan_token.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          test "$ACTUAL_SLUG" = "$EXPECTED_SLUG"
+          gh api "users/${ACTUAL_SLUG}%5Bbot%5D" --jq .id
+          gh api installation/repositories --jq '.repositories[].full_name' | grep -Fx "$GITHUB_REPOSITORY"
+      - name: Scan major dependency PRs
+        if: inputs.credentials-only != true
+        env:
+          GH_TOKEN: ${{ steps.scan_token.outputs.token }}
+        run: node "$RUNNER_TEMP/upkeep-controller.cjs" watchdog

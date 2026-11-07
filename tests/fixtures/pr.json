@@ -1,0 +1,17 @@
+{
+  "number": 12,
+  "state": "open",
+  "user": { "login": "renovate[bot]" },
+  "base": {
+    "ref": "main",
+    "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "repo": { "full_name": "example/project" }
+  },
+  "head": {
+    "ref": "renovate/typescript-7.x",
+    "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "repo": { "full_name": "example/project" }
+  },
+  "labels": [{ "name": "dep:major-review" }],
+  "mergeable": true
+}
