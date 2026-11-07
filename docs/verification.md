@@ -39,8 +39,8 @@ static checks, Playwright/axe, and Lighthouse all passed.
 This verifies actual model/git authentication and CI triggering. It is a composed integration
 diagnostic, not an assertion that a naturally occurring adoptable major passed through the entire
 shared retry workflow. Production Renovate trust checks were not relaxed, and no synthetic adoptable
-verdict was placed on the real blocked major. The fixture must be closed without merging after its
-CI result is recorded.
+verdict was placed on the real blocked major. The fixture was closed without merging after all three
+CI checks passed, and the temporary diagnostic branches were removed.
 
 ## Regression coverage
 
