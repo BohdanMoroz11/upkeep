@@ -18,4 +18,5 @@ Public dependency-update automation extracted from `BohdanMoroz11/personal-websi
   agent commands run with scoped credentials.
 - `npm run check` runs regression tests, bundle freshness, formatting, and preset validation. Run
   `npm run build` after changing runtime code or prompts; commit the generated bundle.
-- License: MIT. No release or compatibility promises until website adoption is verified.
+- License: MIT. Workflow inputs, dispatch contracts, and persisted comment formats are public
+  interfaces; follow docs/releases.md and keep published tags immutable.

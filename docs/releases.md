@@ -27,5 +27,6 @@ formats carry their own version independently of the release number.
 5. Replace development/commit references in the website and consumer examples with the tag in
    reviewed PRs. Do not reference a tag that does not exist yet.
 
-The first release is still pending review and final integration verification. There is no hosted
-service or shared App credential to publish.
+The initial release is **v0.1.0**. See [the changelog](../CHANGELOG.md) and
+[verification record](verification.md) for its scope and evidence. There is no hosted service or
+shared App credential to publish.

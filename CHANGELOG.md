@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.1.0 — 2026-11-07
 
 Initial extraction from the personal website:
 
@@ -21,4 +21,5 @@ Adoption fixes:
 
 Supported scope: GitHub.com, Renovate, npm/package-lock at repository root, and Claude Code. Each
 adopter owns its GitHub App and model credential. See the verification record for observed behavior
-and remaining limits. No release has been published yet.
+and remaining limits. The preset, workflows, prompts, and bundled runtime are released together
+under the v0.1.0 tag.

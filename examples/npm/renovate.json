@@ -1,4 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>BohdanMoroz11/upkeep#main"]
+  "extends": ["github>BohdanMoroz11/upkeep#v0.1.0"]
 }

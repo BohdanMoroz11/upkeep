@@ -67,7 +67,7 @@ describe("standalone packaging and workflow contracts", () => {
     (kind) => {
       const wrapper = workflow(`examples/npm/.github/workflows/upkeep-${kind}.yml`);
       expect(wrapper.jobs[kind].uses).toBe(
-        `BohdanMoroz11/upkeep/.github/workflows/${kind}.yml@main`,
+        `BohdanMoroz11/upkeep/.github/workflows/${kind}.yml@v0.1.0`,
       );
       expect(wrapper.jobs[kind].secrets).not.toBe("inherit");
       expect(wrapper.concurrency["cancel-in-progress"]).toBe(false);

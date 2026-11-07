@@ -1,7 +1,8 @@
 # Setup
 
-Upkeep is unreleased. These are executable development examples; the website has adopted a pinned
-commit, and verification evidence is recorded before the first release.
+This guide targets **v0.1.0**. The
+[website consumer](https://github.com/BohdanMoroz11/personal-website) and
+[verification record](verification.md) show the observed integration behavior and remaining limits.
 
 ## Prerequisites
 
@@ -36,12 +37,11 @@ into your repository, retaining the default filenames. Merge the
 [example Renovate configuration](../examples/npm/renovate.json) into your own configuration. Each
 wrapper maps secrets explicitly; do not replace the mapping with `secrets: inherit`.
 
-The examples use `@main` / `#main` for development. Select a reviewed commit for testing and use a
-tagged release when one exists. Pin the preset and reusable workflows together. The reusable
-workflows obtain their own exact source using
+The examples pin both workflows and preset to **v0.1.0**. Keep those references on the same reviewed
+release. Reusable jobs obtain their own exact source using
 [GitHub's job workflow context](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#job-context),
-so their runtime and prompts come from the selected workflow commit. No second version input or
-consumer npm dependency is needed. GitHub Enterprise Server is not supported by this interface.
+so the runtime and prompts come from the selected workflow commit. No second version input or
+consumer npm dependency is needed. GitHub Enterprise Server is not supported.
 
 Keep `workflow_dispatch` in the review and retry wrappers: the watchdog and completed reviews
 dispatch these consumer files, not Upkeep's files. They must exist on the configured base branch for
