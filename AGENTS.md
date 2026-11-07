@@ -4,8 +4,8 @@ Public dependency-update automation extracted from `BohdanMoroz11/personal-websi
 
 - Initial scope: GitHub, Renovate, npm/package-lock, Claude Code.
 - The source website is the integration consumer. No second consumer is required.
-- Controller, bundled action, prompts, and reusable workflows are implemented. Website adoption and
-  real agent integration are still release gates.
+- Controller, bundled action, prompts, and reusable workflows are implemented. See
+  docs/verification.md for hosted adoption evidence and unobserved natural-update cases.
 - `default.json` is the public Renovate preset; `renovate.json` would configure this repository
   itself.
 - Consumer CI and project instructions stay in the consumer. Shared code must not embed its

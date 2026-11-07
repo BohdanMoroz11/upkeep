@@ -1,6 +1,20 @@
 Review major dependency PR #{{pr}} in {{repository}}. You are its author; consumer CI is the
 validator. Read and follow the project's AGENTS.md / CLAUDE.md.
 
+## Required upstream research
+
+Before deciding the outcome, use WebFetch to read at least one official upstream release note,
+changelog, or migration guide for this major version. Use WebSearch only to locate that source. This
+is required even when npm metadata already proves a peer conflict and the verdict will be BLOCKED. A
+link copied from the PR body does not count as a source read. Do not infer breaking changes from the
+package name or previous comments.
+
+The final report must include a **Sources read** section listing the actual upstream URLs fetched
+and what each established, followed by the npm commands used for peer checks. If fetching official
+upstream guidance fails, retry a suitable official source; if none can be read, report NEEDS-HUMAN
+and explain the retrieval failure. Do not claim a completed source-backed review while admitting
+that no release guidance was fetched.
+
 Your deliverable is a verdict. Changes are only a possible consequence. Do not invent migration work
 when none is needed.
 

@@ -61,6 +61,7 @@ executing a copied bundle without sources or node_modules. A reusable CI check v
 workflow-source context on the hosted runner. Workflow syntax is checked with actionlint; its
 current schema needs one narrow exception for the documented new job identity fields.
 
-Website adoption, controlled event cases, and an actual Claude review/retry are the remaining
-integration gates. A second real consumer is out of scope. Release only after the website uses the
-shared path; then retire duplicate local logic and tag the preset/workflows/runtime together.
+The website uses the pinned shared path. Hosted blocked-review/gate and controlled agent fix/push
+evidence is recorded in [verification](verification.md), with unobserved natural-update cases
+identified separately. A second real consumer is out of scope. Complete cleanup review before
+tagging preset/workflows/runtime together.
