@@ -181,6 +181,18 @@ describe("controller trust and review ordering", () => {
       body: { inputs: { pr_number: "12", head_sha: sha, ci_run_id: "501" } },
     });
   });
+  it.each(["CLEAN", "MIGRATED", "NEEDS-HUMAN"])(
+    "clears a stale blocked label on a %s re-review",
+    async (kind) => {
+      const h = harness({ comments: [verdict(kind)] });
+      h.state.pr.labels.push({ name: "dep:blocked" });
+      await h.c.verifyReview(12, timestamp);
+      expect(h.writes()[0]).toMatchObject({
+        method: "DELETE",
+        path: `repos/${repo}/issues/12/labels/dep:blocked`,
+      });
+    },
+  );
   it.each(["old", "outsider", "moved"])(
     "rejects a %s verdict and reports failure once",
     async (kind) => {

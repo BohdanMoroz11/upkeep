@@ -209,8 +209,14 @@ export function createController({
     if (result.verdict === "BLOCKED") {
       await label(n);
       await blocked(n, "capture", pr.head.sha);
-    } else if (["CLEAN", "MIGRATED"].includes(result.verdict))
-      await recheckCi(n, pr.head.sha, pr.head.ref);
+    } else {
+      if (pr.labels.some((l) => l.name === "dep:blocked")) {
+        await trusted(n, pr.head.sha);
+        await api.request(`${repoPath}/issues/${n}/labels/dep:blocked`, { method: "DELETE" });
+      }
+      if (["CLEAN", "MIGRATED"].includes(result.verdict))
+        await recheckCi(n, pr.head.sha, pr.head.ref);
+    }
     return result;
   }
   async function verifyRetry(n, ciRunId, originalSha) {
