@@ -6,7 +6,8 @@ gate.
 ## Routine updates
 
 Renovate groups patch, minor, pin, and digest updates into one PR eligible for platform automerge.
-Required consumer CI is the merge gate. Major updates stay separate and receive `dep:major-review`.
+Required consumer CI is the merge gate. Major updates explicitly clear inherited grouping so each
+target can be reviewed and tracked independently, and receive `dep:major-review`.
 
 ## Major review
 

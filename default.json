@@ -15,7 +15,8 @@
       "description": "Majors: separate PRs, held for review, labeled for the agent",
       "matchUpdateTypes": ["major"],
       "automerge": false,
-      "addLabels": ["dep:major-review"]
+      "addLabels": ["dep:major-review"],
+      "groupName": null
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import { dirname, resolve, relative } from "node:path";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const result = await build({
@@ -14,16 +14,19 @@ const result = await build({
   format: "cjs",
   minify: false,
   legalComments: "inline",
+  banner: {
+    js: `/* Bundled dependency: semver (ISC).\n${readFileSync(resolve(root, "node_modules/semver/LICENSE"), "utf8")}*/`,
+  },
   plugins: [
     {
       name: "prompt-text",
       setup(build) {
         build.onResolve({ filter: /\.md\?raw$/ }, (args) => ({
-          path: resolve(args.resolveDir, args.path.replace(/\?raw$/, "")),
+          path: relative(root, resolve(args.resolveDir, args.path.replace(/\?raw$/, ""))),
           namespace: "prompt",
         }));
         build.onLoad({ filter: /.*/, namespace: "prompt" }, (args) => ({
-          contents: readFileSync(args.path, "utf8"),
+          contents: readFileSync(resolve(root, args.path), "utf8"),
           loader: "text",
         }));
       },
