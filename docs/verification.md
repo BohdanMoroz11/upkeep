@@ -19,6 +19,28 @@ The initial review admitted it had not fetched release guidance. The revised pro
 research even for peer-blocked updates, a Sources read section, and a retrieval-failure explanation.
 This is an agent instruction, not a mechanical proof that a model actually read a document.
 
+## Controlled agent fix and push
+
+A disposable [fixture PR #79](https://github.com/BohdanMoroz11/personal-website/pull/79) introduced
+a small broken sum function and an asserting unit test, without changing production code or
+manifests.
+[Initial CI failed at the intended assertion](https://github.com/BohdanMoroz11/personal-website/actions/runs/42386748356).
+
+An owner-only manual diagnostic used the same pinned Claude action, App credentials, bot identity,
+disabled checkout credential persistence, and token-after-install ordering as the shared fixer.
+[The diagnostic passed](https://github.com/BohdanMoroz11/personal-website/actions/runs/42387045904).
+The agent read the CI log, changed only subtraction to addition, committed as the configured App
+bot, pushed
+[commit 8e7fb50](https://github.com/BohdanMoroz11/personal-website/commit/8e7fb50c6873eb65fc865edde84d9c703e730b17),
+and reported the matching final SHA. The App push triggered
+[new consumer CI](https://github.com/BohdanMoroz11/personal-website/actions/runs/42387156438).
+
+This verifies actual model/git authentication and CI triggering. It is a composed integration
+diagnostic, not an assertion that a naturally occurring adoptable major passed through the entire
+shared retry workflow. Production Renovate trust checks were not relaxed, and no synthetic adoptable
+verdict was placed on the real blocked major. The fixture must be closed without merging after its
+CI result is recorded.
+
 ## Regression coverage
 
 The test suite covers clean/adoptable verdict eligibility, CI finishing before review, duplicate and

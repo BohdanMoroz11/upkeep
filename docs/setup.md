@@ -1,7 +1,7 @@
 # Setup
 
-Upkeep is unreleased. These are executable development examples; website migration and a real Claude
-review/retry remain to be verified before the first release.
+Upkeep is unreleased. These are executable development examples; the website has adopted a pinned
+commit, and verification evidence is recorded before the first release.
 
 ## Prerequisites
 
@@ -80,9 +80,10 @@ GraphQL comment IDs and marker formats are preserved.
 ## Verification and adoption
 
 First run the watchdog wrapper manually with `credentials_only: true`. It requests all permissions
-used by Upkeep, checks the App identity and installation access, and skips PR scanning. Then verify
-the website's recorded event cases and an actual agent review/retry before retiring local workflows.
-Fixtures cover state transitions but cannot prove hosted model authentication or git pushes.
+used by Upkeep, checks the App identity and installation access, and skips PR scanning. The website
+has also exercised a real blocked review, the blocked retry gate, and a controlled agent fix/push
+diagnostic. See [verification](verification.md) for exact coverage and limits. Fixtures cover state
+transitions separately from hosted model authentication and git pushes.
 
 Major updates still require a human merge decision. Read [behavior](behavior.md) and
 [security assumptions](../SECURITY.md) before adoption.
